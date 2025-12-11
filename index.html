@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes for Flood Relief</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Supabase -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-book-open"></i>
+                <div>
+                    <h1 id="site-title">Notes for Flood Relief</h1>
+                    <p id="mission">A free platform to share study materials for students affected by floods in Sri Lanka</p>
+                </div>
+            </div>
+            <button id="lang-toggle" class="lang-btn">
+                <span class="lang-text">සිංහල</span>
+                <i class="fas fa-language"></i>
+            </button>
+        </header>
+
+        <!-- Search and Upload -->
+        <div class="search-upload">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search" placeholder="Search resources...">
+            </div>
+            
+            <div class="upload-area">
+                <div class="upload-btn" id="upload-btn">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <div>
+                        <strong id="upload-text">Upload Notes</strong>
+                        <small id="upload-size-text">PDF, DOC, JPG, PNG (Max 1 GB)</small>
+                    </div>
+                </div>
+                <input type="file" id="file-input" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" hidden>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <select id="grade-filter">
+                <option value="all">All Grades</option>
+                <option value="Grade 3">Grade 3</option>
+                <option value="Grade 4">Grade 4</option>
+                <option value="Grade 5">Grade 5</option>
+                <option value="Grade 6">Grade 6</option>
+                <option value="Grade 7">Grade 7</option>
+                <option value="Grade 8">Grade 8</option>
+                <option value="Grade 9">Grade 9</option>
+                <option value="Grade 10">Grade 10</option>
+                <option value="Grade 11">Grade 11</option>
+                <option value="Grade 12">Grade 12</option>
+                <option value="Grade 13">Grade 13</option>
+                <option value="University">University</option>
+            </select>
+            
+            <div class="view-toggle">
+                <button id="list-view" class="view-btn active"><i class="fas fa-list"></i> List</button>
+                <button id="section-view" class="view-btn"><i class="fas fa-folder"></i> Sections</button>
+            </div>
+        </div>
+
+        <!-- Resources Count -->
+        <div class="results-count">
+            <h3 id="resources-title">Available Resources</h3>
+            <span id="results-count">0 resources found</span>
+        </div>
+
+        <!-- Resources List -->
+        <div id="resources-container" class="resources-container">
+            <div id="resources-list" class="resources-list">
+                <!-- Resources will load here -->
+            </div>
+            
+            <div id="sections-view" class="sections-view" style="display: none;">
+                <!-- Sections will load here -->
+            </div>
+        </div>
+
+        <!-- Flagged Section -->
+        <div id="flagged-section" style="display: none;">
+            <h3><i class="fas fa-flag"></i> Flagged Items</h3>
+            <div id="flagged-list"></div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>Notes for Flood Relief © 2025 - Helping Sri Lankan Students</p>
+        </footer>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Upload Notes</h3>
+                <button class="close-btn" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="file-info" style="display: none; margin-bottom: 20px; padding: 10px; background: #f5f5f5; border-radius: 5px;">
+                    <p><strong>Selected File:</strong> <span id="selected-file">No file selected</span></p>
+                    <p><strong>File Size:</strong> <span id="file-size">-</span></p>
+                </div>
+                
+                <div class="form-group">
+                    <label id="grade-label">Grade Level *</label>
+                    <select id="modal-grade" required>
+                        <option value="">Select Grade</option>
+                        <option value="Grade 3">Grade 3</option>
+                        <option value="Grade 4">Grade 4</option>
+                        <option value="Grade 5">Grade 5</option>
+                        <option value="Grade 6">Grade 6</option>
+                        <option value="Grade 7">Grade 7</option>
+                        <option value="Grade 8">Grade 8</option>
+                        <option value="Grade 9">Grade 9</option>
+                        <option value="Grade 10">Grade 10</option>
+                        <option value="Grade 11">Grade 11</option>
+                        <option value="Grade 12">Grade 12</option>
+                        <option value="Grade 13">Grade 13</option>
+                        <option value="University">University</option>
+                    </select>
+                </div>
+                
+                <!-- University specific fields (initially hidden) -->
+                <div id="university-fields" style="display: none;">
+                    <div class="form-group">
+                        <label id="campus-label">Campus *</label>
+                        <input type="text" id="modal-campus" placeholder="e.g., University of Colombo">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label id="faculty-label">Faculty *</label>
+                        <input type="text" id="modal-faculty" placeholder="e.g., Faculty of Science">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label id="department-label">Department *</label>
+                        <input type="text" id="modal-department" placeholder="e.g., Department of Computer Science">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label id="description-label">Description *</label>
+                    <textarea id="modal-description" placeholder="Describe these notes..." required rows="3"></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button id="cancel-upload" class="btn secondary">Cancel</button>
+                    <button id="submit-upload" class="btn primary">
+                        <i class="fas fa-upload"></i> Upload
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification-container"></div>
+
+    <!-- Simple Script for Upload -->
+    <script>
+        // Simple upload trigger
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadBtn = document.getElementById('upload-btn');
+            const fileInput = document.getElementById('file-input');
+            
+            if (uploadBtn && fileInput) {
+                uploadBtn.addEventListener('click', function() {
+                    console.log("Upload button clicked");
+                    fileInput.click();
+                });
+                
+                fileInput.addEventListener('change', function(e) {
+                    console.log("File selected:", e.target.files[0]?.name);
+                    if (e.target.files.length > 0) {
+                        const file = e.target.files[0];
+                        
+                        // Show file info
+                        document.getElementById('file-info').style.display = 'block';
+                        document.getElementById('selected-file').textContent = file.name;
+                        
+                        // Format file size
+                        const fileSize = file.size;
+                        let sizeText = '';
+                        if (fileSize < 1024) {
+                            sizeText = fileSize + ' bytes';
+                        } else if (fileSize < 1048576) {
+                            sizeText = (fileSize / 1024).toFixed(2) + ' KB';
+                        } else if (fileSize < 1073741824) {
+                            sizeText = (fileSize / 1048576).toFixed(2) + ' MB';
+                        } else {
+                            sizeText = (fileSize / 1073741824).toFixed(2) + ' GB';
+                        }
+                        document.getElementById('file-size').textContent = sizeText;
+                        
+                        // Show modal
+                        document.getElementById('upload-modal').style.display = 'block';
+                    }
+                });
+            }
+            
+            // Grade change handler for university fields
+            const gradeSelect = document.getElementById('modal-grade');
+            const universityFields = document.getElementById('university-fields');
+            
+            if (gradeSelect && universityFields) {
+                gradeSelect.addEventListener('change', function() {
+                    if (this.value === 'University') {
+                        universityFields.style.display = 'block';
+                    } else {
+                        universityFields.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Close modal
+            document.getElementById('close-modal').addEventListener('click', function() {
+                document.getElementById('upload-modal').style.display = 'none';
+                fileInput.value = '';
+                document.getElementById('file-info').style.display = 'none';
+                document.getElementById('university-fields').style.display = 'none';
+                document.getElementById('modal-grade').value = '';
+                document.getElementById('modal-campus').value = '';
+                document.getElementById('modal-faculty').value = '';
+                document.getElementById('modal-department').value = '';
+                document.getElementById('modal-description').value = '';
+            });
+            
+            document.getElementById('cancel-upload').addEventListener('click', function() {
+                document.getElementById('upload-modal').style.display = 'none';
+                fileInput.value = '';
+                document.getElementById('file-info').style.display = 'none';
+                document.getElementById('university-fields').style.display = 'none';
+                document.getElementById('modal-grade').value = '';
+                document.getElementById('modal-campus').value = '';
+                document.getElementById('modal-faculty').value = '';
+                document.getElementById('modal-department').value = '';
+                document.getElementById('modal-description').value = '';
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(e) {
+                const modal = document.getElementById('upload-modal');
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                    fileInput.value = '';
+                    document.getElementById('file-info').style.display = 'none';
+                    document.getElementById('university-fields').style.display = 'none';
+                    document.getElementById('modal-grade').value = '';
+                    document.getElementById('modal-campus').value = '';
+                    document.getElementById('modal-faculty').value = '';
+                    document.getElementById('modal-department').value = '';
+                    document.getElementById('modal-description').value = '';
+                }
+            });
+            
+            console.log("Simple upload script loaded");
+        });
+    </script>
+
+    <!-- Main App Script -->
+    <script src="app.js"></script>
+</body>
+</html>
